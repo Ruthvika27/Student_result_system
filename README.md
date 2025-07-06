@@ -3,7 +3,7 @@
 A full-stack project to manage student results, generate report cards, and visualize class performance.
 
 ## 💻 Tech Stack
-- **Backend:** Node.js, Express.js
+- **Backend:** Node.js, Express.js, EJS
 - **Database:** MongoDB
 - **Extras:** Chart.js, PDFKit, Multer, Nodemailer
 
