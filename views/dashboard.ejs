@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <h1 style="text-align: center;">Student Dashboard</h1>
+  <div style="text-align: center; margin-bottom: 20px;">
+  <a href="/add" class="add-btn">Add New Student</a>
+    </div>
+    <form action="/upload-csv" method="POST" enctype="multipart/form-data" 
+    style="text-align: center; margin: 20px;">
+    <input type="file" name="csvfile" accept=".csv" required />
+    <button type="submit">Upload CSV</button>
+    </form>
+  
+  <table border="1" class="center-table">
+    <tr>
+      <th>Name</th>
+      <th>Roll</th>
+      <th>Total</th>
+      <th>Grade</th>
+      <th>Result</th>
+      <th>Changes</th>
+      <th>Result</th>
+    </tr>
+    <% students.forEach(student => { %>
+      <tr>
+        <td><%= student.name %></td>
+        <td><%= student.rollNo %></td>
+        <td><%= student.total %></td>
+        <td><%= student.grade %></td>
+        <td><%= student.result %></td>
+        <td><a href="/edit/<%= student._id %>">Edit</a> | <a href="/delete/<%= student._id %>" onclick="return confirm('Are you sure you want to delete this student?');">Delete</a></td>
+        <td><a href="/student/<%= student._id %>/pdf" target="_blank">Download PDF</a></td>
+
+
+      </tr>
+    <% }) %>
+  </table>
+  <!-- chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- canvas for chart -->
+<canvas id="resultChart"></canvas>
+
+<!-- actual chart logic -->
+<script>
+  const ctx = document.getElementById('resultChart').getContext('2d');
+  const resultChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['Pass', 'Fail'],
+      datasets: [{
+        label: 'Pass/Fail',
+        data: [<%= passCount %>, <%= failCount %>],
+        backgroundColor: ['#4CAF50', '#F44336'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Pass vs Fail Summary'
+        }
+      }
+    }
+  });
+</script>
+
+<h2 style="text-align: center;">📈 Total Marks Bar Chart</h2>
+<canvas id="totalChart" ></canvas>
+
+<h2 style="text-align: center;">📊 Subject-wise Average</h2>
+<canvas id="subjectChart"></canvas>
+
+<% if (topper) { %>
+  <h2 style="text-align: center;">🏆 Topper</h2>
+  <p style="text-align: center;">
+    <strong><%= topper.name %></strong> with <strong><%= topper.total %></strong> marks!
+  </p>
+<% } else { %>
+  <p style="text-align: center;">No students available to find a topper 🥲</p>
+<% } %>
+
+
+<script>
+  // Bar chart for Total Marks
+  const totalCtx = document.getElementById('totalChart').getContext('2d');
+  new Chart(totalCtx, {
+    type: 'bar',
+    data: {
+      labels: <%- names %>,
+      datasets: [{
+        label: 'Total Marks',
+        data: <%- totals %>,
+        backgroundColor: '#2196F3'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Total Marks per Student'
+        }
+      }
+    }
+  });
+
+  // Subject-wise Average Chart
+  const subjectCtx = document.getElementById('subjectChart').getContext('2d');
+  new Chart(subjectCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Math', 'Science', 'English'],
+      datasets: [{
+        label: 'Average Marks',
+        data: [<%= mathAvg %>, <%= scienceAvg %>, <%= englishAvg %>],
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Subject-wise Average Marks'
+        }
+      }
+    }
+  });
+</script>
+<button id="toggleDark" style="position: absolute; top: 10px; right: 10px;">🌙 Dark Mode</button>
+
+<script>
+  const toggle = document.getElementById("toggleDark");
+
+  toggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+
+    // Optional: change button emoji
+    toggle.textContent = document.body.classList.contains("dark-mode") ? "☀️ Light Mode" : "🌙 Dark Mode";
+  });
+</script>
+
+
+</body>
+</html>
